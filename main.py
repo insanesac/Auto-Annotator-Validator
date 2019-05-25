@@ -9,12 +9,6 @@ Created on Mon May  6 14:16:25 2019
 import os
 import cv2
 
-MYNTRA_MASK_PATH = r'/home/insanesac/workspace/Auto-annotators/trained_models/mask_rcnn_tags_0060.h5'
-
-MYNTRA_EAST_PATH = r'/home/insanesac/workspace/Auto-annotators/trained_models/east/checkpoint'
-
-BAJAJ_FASTER_RCNN_PATH = r''
-
 def txt_path_reader(dataset):
     txt_files = []
     files = os.listdir(dataset)
@@ -43,13 +37,14 @@ parser = argparse.ArgumentParser(description='Auto Annotator')
 parser.add_argument('--option', type = str, help='Annotator(A) or Validator(V) or Trainer(T)')
 parser.add_argument('--dataset', type = str, help='path to dataset')
 parser.add_argument('--mode', type = int, help='0 -> myntra east, 1 -> myntra mask, 2 -> bajaj rcnn')
+parser.add_argument('--test', type = int, help='F -> Visualize full data, P -> Visulaize random 10 percent', default = 'P')
 
 args = vars(parser.parse_args())
 
 dataset = args['dataset']
 mode = args['mode']
-
 option = args['option']
+test = args['test']
 
 if mode == 0:
     mode_name = 'EAST'
@@ -75,6 +70,21 @@ if option == 'A':
         print('\n')
         from east_main import EastAnnot
         EastAnnot.inference(img_list)
+        
+    elif mode == 1:
+        print('\n')
+        print('Switching to MASKNET mode')
+        print('\n')
+        from mask_main import MaskAnnot
+        MaskAnnot.inference(img_list)
+    
+    elif mode == 2:
+        print('\n')
+        print('Switching to RCNN mode')
+        print('\n')
+        from rcnn_main import RcnnAnnot
+        RcnnAnnot.inference(img_list)
+    
             
 elif option == 'V':
     print('\n')
@@ -89,15 +99,26 @@ elif option == 'V':
         print('Switching to EAST mode')
         print('\n')
         from east_main import EastValid
-        EastValid.verify(img_list,txt_list)
+        EastValid.verify(img_list,txt_list,test)
+        
+    elif mode == 0:
+        print('\n')
+        print('Switching to MASKNET mode')
+        print('\n')
+        from mask_main import MaskValid
+        MaskValid.verify(img_list, txt_list)
+        
+    elif mode == 0:
+        print('\n')
+        print('Switching to RCNN mode')
+        print('\n')
+        from rcnn_main import RcnnValid
+        RcnnValid.verify(img_list,txt_list)
     
 else:
     print('\n')
     print('Setting up Trainer')
     
-    txt_list = txt_path_reader(dataset)
-    if len(txt_list)  == 0:
-        raise Exception({'message': 'No text annotation files found in dataset folder'})
     if mode == 0:
         print('\n')
         print('Switching to EAST mode')

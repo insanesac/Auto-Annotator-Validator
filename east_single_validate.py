@@ -6,11 +6,9 @@ Created on Wed May  8 12:28:14 2019
 @author: insanesac
 """
 
-import csv
-import os
-import cv2
+import csv, os, cv2
 import numpy as np
-import shutil
+import shutil, random
 
 report_path = 'east_report.txt'
 invalid = []
@@ -90,7 +88,8 @@ def check_and_validate_polys(polys, tags, xxx_todo_changeme,base):
         validated_tags.append(tag)
     return np.array(validated_polys), np.array(validated_tags),invalid,wrong
 
-def validator(img_path,txt_path):
+def validator(img_path,txt_path, test):
+    length = len(img_path)
     img = cv2.imread(img_path)
     
     h, w, _ = img.shape
@@ -109,7 +108,13 @@ def validator(img_path,txt_path):
         shutil.move(iv_img,dest1+os.path.basename(iv_img))
         shutil.move(iv_txt,dest2+os.path.basename(iv_txt))
         
-    
-    
+    if test == 'P':
+        print('Visualizing random 10 percent data')
+        num_selections = int(length/10)
 
-#                
+        new_img_list = random.sample(img_path, num_selections)
+        
+        for img in img_path:
+            val_img = img
+            val_base = val.split(',')[0]
+            val_txt = val_base + '.txt'
